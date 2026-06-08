@@ -264,10 +264,10 @@ do not run on macOS. MLX-only models are not served by Odysseus.
 **One-command launcher** (creates the venv, installs deps, runs setup, starts the
 server; safe to re-run):
 
-```powershell
+```cmd
 git clone https://github.com/pewdiepie-archdaemon/odysseus.git
 cd odysseus
-powershell -ExecutionPolicy Bypass -File .\launch-windows.ps1
+launch-windows.cmd
 ```
 
 Or do it by hand:
