@@ -1295,11 +1295,11 @@ def function_call_to_tool_block(name: str, arguments: str) -> Optional[ToolBlock
         elif action == "create_theme":
             colors = args.get("colors", {})
             theme_name = name or value or "custom"
-            bg = colors.get("bg", "#282c34")
-            fg = colors.get("fg", "#9cdef2")
-            panel = colors.get("panel", "#111111")
-            border = colors.get("border", "#355a66")
-            accent = colors.get("accent", "#e06c75")
+            bg = colors.get("bg", "#1c1c1e")
+            fg = colors.get("fg", "#e6d6b8")
+            panel = colors.get("panel", "#252528")
+            border = colors.get("border", "#443a2e")
+            accent = colors.get("accent", "#bd2b32")
             content = f"create_theme {theme_name} {bg} {fg} {panel} {border} {accent}"
             # Append advanced overrides as key=value
             adv_keys = [

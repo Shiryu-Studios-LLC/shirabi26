@@ -17,11 +17,11 @@
 
 :root {
   /* Core palette */
-  --bg: #282c34;
-  --fg: #9cdef2;
-  --panel: #111;
-  --border: #355a66;
-  --red: #e06c75;
+  --bg: #1c1c1e;
+  --fg: #e6d6b8;
+  --panel: #252528;
+  --border: #443a2e;
+  --red: #bd2b32;
   /* Were `var(--green)` / `var(--warn)` — self-referential, so they
      resolved to invalid and every site fell back to its own literal
      (or, for sites with no fallback, painted as transparent/inherit).
@@ -30,16 +30,16 @@
   --warn: #f0ad4e;
 
   /* Syntax highlighting */
-  --hl-bg: #1e2228;
-  --hl-fg: #9cdef2;
-  --hl-keyword: #c678dd;
-  --hl-string: #e5c07b;
-  --hl-comment: #828997;
-  --hl-function: #61afef;
-  --hl-number: #d19a66;
-  --hl-builtin: #56b6c2;
-  --hl-variable: #abb2bf;
-  --hl-params: #a8c0d4;
+  --hl-bg: #101013;
+  --hl-fg: #e6d6b8;
+  --hl-keyword: #af89cc;
+  --hl-string: #dfb56c;
+  --hl-comment: #8a8272;
+  --hl-function: #7ca3d2;
+  --hl-number: #e09462;
+  --hl-builtin: #5ebfb2;
+  --hl-variable: #e3db7b;
+  --hl-params: #eedcb2;
 
   /* Semantic colors */
   --color-error: #ff4444;
@@ -6010,8 +6010,8 @@ body.bg-pattern-sparkles {
       }
     }
 /* SYNTAX HIGHLIGHTING — uses theme vars from style.css, no hardcoded overrides */
-.hljs { color: var(--hl-fg, #9cdef2); background: none !important; }
-pre { background: var(--code-bg, var(--hl-bg, #282c34)) !important; }
+.hljs { color: var(--hl-fg, #e6d6b8); background: none !important; }
+pre { background: var(--code-bg, var(--hl-bg, #1c1c1e)) !important; }
 
     /* ---------- Search overlay (Ctrl+K command palette) ---------- */
     .search-overlay {
@@ -11642,7 +11642,7 @@ textarea.memory-add-input {
 
 .doc-language-select {
   background-color: var(--bg);
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239cdef2' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 15 12 9 18 15'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23e6d6b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 15 12 9 18 15'/></svg>");
   background-repeat: no-repeat;
   background-position: right 4px center;
   color: var(--fg);

@@ -107,7 +107,7 @@ class Spinner {
       if (i === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     }
-    ctx.strokeStyle = 'rgba(156, 222, 242, 0.5)';
+    ctx.strokeStyle = 'rgba(230, 214, 184, 0.5)';
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
@@ -117,7 +117,7 @@ class Spinner {
     const cy = midY + Math.sin(cPhase) * AMP;
     ctx.beginPath();
     ctx.arc(cx, cy, 1.5, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(156, 222, 242, 0.9)';
+    ctx.fillStyle = 'rgba(230, 214, 184, 0.9)';
     ctx.fill();
 
     if (this.isRunning) {
@@ -178,7 +178,7 @@ class Spinner {
     if (!this._wpColors) {
       const s = getComputedStyle(document.documentElement);
       this._wpColors = {
-        fg: s.getPropertyValue('--red').trim() || s.getPropertyValue('--fg').trim() || '#9cdef2',
+        fg: s.getPropertyValue('--red').trim() || s.getPropertyValue('--fg').trim() || '#e6d6b8',
         track: s.getPropertyValue('--border').trim() || '#355a66',
       };
     }

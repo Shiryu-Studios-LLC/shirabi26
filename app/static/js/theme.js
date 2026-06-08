@@ -9,7 +9,7 @@ import { makeWindowDraggable } from './windowDrag.js';
 import { snapModalToZone } from './tileManager.js';
 
 export const THEMES = {
-  dark:       { bg:'#282c34', fg:'#9cdef2', panel:'#111111', border:'#355a66', red:'#e06c75' },
+  dark:       { bg:'#1c1c1e', fg:'#e6d6b8', panel:'#252528', border:'#443a2e', red:'#bd2b32' },
   light:      { bg:'#f0ebe3', fg:'#5a5248', panel:'#faf6f0', border:'#d4cdc2', red:'#c47d5a' },
   midnight:   { bg:'#0d1117', fg:'#c9d1d9', panel:'#161b22', border:'#30363d', red:'#f85149' },
   paper:      { bg:'#faf8f5', fg:'#3b3836', panel:'#ffffff', border:'#d5d0c8', red:'#c5ac4a' },
@@ -36,9 +36,9 @@ const LS_KEY = 'shirabe-theme';
 const CUSTOM_THEMES_KEY = 'shirabe-custom-themes';
 
 const FONT_MAP = {
-  mono: "'Fira Code', monospace",
-  sans: "system-ui, -apple-system, 'Segoe UI', sans-serif",
-  serif: "Georgia, 'Times New Roman', serif",
+  mono: "'Fira Code', 'BIZ UDGothic', 'Meiryo', monospace",
+  sans: "system-ui, -apple-system, 'BIZ UDPGothic', 'Hiragino Kaku Gothic ProN', 'Meiryo', 'Segoe UI', sans-serif",
+  serif: "Georgia, 'BIZ UDPMincho', 'Hiragino Mincho ProN', 'MS Mincho', 'Times New Roman', serif",
 };
 const DEFAULT_FONT = 'mono';
 const DEFAULT_DENSITY = 'comfortable';
@@ -46,7 +46,7 @@ const MAX_CUSTOM_THEMES = 8;
 
 // Default background patterns for built-in themes
 const THEME_DEFAULT_PATTERN = {
-  dark:       'none',
+  dark:       'petals',
   light:      'dots',
   midnight:   'rain',
   paper:      'dots',
@@ -62,6 +62,7 @@ const THEME_DEFAULT_PATTERN = {
 
 // Default effect colors for specific themes (overrides --fg)
 const THEME_DEFAULT_EFFECT_COLOR = {
+  dark:       '#bd2b32',
   midnight:   '#ffffff',
   organs:     '#451616',
   cute:       '#ff8cb8',
@@ -70,6 +71,7 @@ const THEME_DEFAULT_EFFECT_COLOR = {
 
 // Default effect intensity (0..1) per theme. Any theme not listed defaults to 1.
 const THEME_DEFAULT_INTENSITY = {
+  dark:       0.35,
   midnight:   0.5,
   terminal:   0.8,
   organs:     0.65,
@@ -717,7 +719,7 @@ export function initThemeUI() {
         if (fs) fs.value = f;
         if (ds) ds.value = d;
         if (ps) ps.value = p;
-        if (ecs) ecs.value = ec || colors.fg || '#9cdef2';
+        if (ecs) ecs.value = ec || colors.fg || '#e6d6b8';
         if (eis) eis.value = String(Math.round(ei * 100));
         if (szs) szs.value = String(Math.round(sz * 100));
         if (frs) frs.checked = fr;
@@ -1049,7 +1051,7 @@ export function initThemeUI() {
     newBtn.addEventListener('click', () => {
       const ec = document.getElementById('theme-bg-effect-color');
       if (ec) {
-        const fg = currentColors.fg || '#9cdef2';
+        const fg = currentColors.fg || '#e6d6b8';
         ec.value = fg;
         applyBgEffectColor('');
         const s = getSaved(); if (s) _saveFull(s.name, s.colors);
@@ -1142,7 +1144,7 @@ export function initThemeUI() {
 
   const effectColorPicker = document.getElementById('theme-bg-effect-color');
   if (effectColorPicker) {
-    effectColorPicker.value = _initEffectColor || currentColors.fg || '#9cdef2';
+    effectColorPicker.value = _initEffectColor || currentColors.fg || '#e6d6b8';
     effectColorPicker.addEventListener('input', () => {
       applyBgEffectColor(effectColorPicker.value);
       const s = getSaved(); if (s) _saveFull(s.name, s.colors);
@@ -1522,7 +1524,7 @@ function _initSynapse() {
 
   function getColor() {
     const s = getComputedStyle(document.documentElement);
-    return s.getPropertyValue('--bg-effect-color').trim() || s.getPropertyValue('--fg').trim() || '#9cdef2';
+    return s.getPropertyValue('--bg-effect-color').trim() || s.getPropertyValue('--fg').trim() || '#e6d6b8';
   }
 
   function spawnPulse() {
@@ -1613,7 +1615,7 @@ function _initRain() {
 
   function getColor() {
     const s = getComputedStyle(document.documentElement);
-    return s.getPropertyValue('--bg-effect-color').trim() || s.getPropertyValue('--fg').trim() || '#9cdef2';
+    return s.getPropertyValue('--bg-effect-color').trim() || s.getPropertyValue('--fg').trim() || '#e6d6b8';
   }
 
   function spawn() {
@@ -1704,7 +1706,7 @@ function _initConstellations() {
 
   function getColor() {
     const s = getComputedStyle(document.documentElement);
-    return s.getPropertyValue('--bg-effect-color').trim() || s.getPropertyValue('--fg').trim() || '#9cdef2';
+    return s.getPropertyValue('--bg-effect-color').trim() || s.getPropertyValue('--fg').trim() || '#e6d6b8';
   }
 
   let t = 0;
@@ -1790,8 +1792,8 @@ function _initPerlinFlow() {
   resize();
   const _onResize = () => resize();
   window.addEventListener('resize', _onResize);
-  function getColor() { const s = getComputedStyle(document.documentElement); return s.getPropertyValue('--bg-effect-color').trim() || s.getPropertyValue('--fg').trim() || '#9cdef2'; }
-  function getBg() { return getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#282c34'; }
+  function getColor() { const s = getComputedStyle(document.documentElement); return s.getPropertyValue('--bg-effect-color').trim() || s.getPropertyValue('--fg').trim() || '#e6d6b8'; }
+  function getBg() { return getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#1c1c1e'; }
   let _cachedBg = '', _fadeStyle = '';
   function getFade() {
     const bg = getBg();
@@ -1856,7 +1858,7 @@ function _initPetals() {
   resize();
   const _onResize = () => resize();
   window.addEventListener('resize', _onResize);
-  function getColor() { const s = getComputedStyle(document.documentElement); return s.getPropertyValue('--bg-effect-color').trim() || s.getPropertyValue('--fg').trim() || '#9cdef2'; }
+  function getColor() { const s = getComputedStyle(document.documentElement); return s.getPropertyValue('--bg-effect-color').trim() || s.getPropertyValue('--fg').trim() || '#e6d6b8'; }
   function draw() {
     if (!document.body.classList.contains('bg-pattern-petals')) { window.removeEventListener('resize', _onResize); canvas.remove(); return; }
     requestAnimationFrame(draw);
@@ -1907,7 +1909,7 @@ function _initSparkles() {
   resize();
   const _onResize = () => resize();
   window.addEventListener('resize', _onResize);
-  function getColor() { const s = getComputedStyle(document.documentElement); return s.getPropertyValue('--bg-effect-color').trim() || s.getPropertyValue('--fg').trim() || '#9cdef2'; }
+  function getColor() { const s = getComputedStyle(document.documentElement); return s.getPropertyValue('--bg-effect-color').trim() || s.getPropertyValue('--fg').trim() || '#e6d6b8'; }
   function drawStar(x, y, r, c, alpha) {
     ctx.save(); ctx.translate(x, y); ctx.fillStyle = c; ctx.globalAlpha = alpha;
     // 4-point star

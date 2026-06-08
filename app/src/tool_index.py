@@ -478,11 +478,12 @@ class ToolIndex:
 _tool_index: Optional[ToolIndex] = None
 _last_attempt = 0.0
 _RETRY_INTERVAL = 30.0
+_has_warned = False
 
 
 def get_tool_index() -> Optional[ToolIndex]:
     """Get or create the singleton ToolIndex. Returns None if unavailable."""
-    global _tool_index, _last_attempt
+    global _tool_index, _last_attempt, _has_warned
 
     if _tool_index is not None and _tool_index.healthy:
         return _tool_index
@@ -495,8 +496,13 @@ def get_tool_index() -> Optional[ToolIndex]:
     try:
         _tool_index = ToolIndex()
         _tool_index.index_builtin_tools()
+        _has_warned = False  # Reset on successful connection
         return _tool_index
     except Exception as e:
-        logger.warning(f"ToolIndex init failed (will retry in {_RETRY_INTERVAL}s): {e}")
+        if not _has_warned:
+            logger.warning(f"ToolIndex init failed (will retry in {_RETRY_INTERVAL}s): {e}")
+            _has_warned = True
+        else:
+            logger.debug(f"ToolIndex init failed (will retry in {_RETRY_INTERVAL}s): {e}")
         _tool_index = None
         return None
