@@ -1077,10 +1077,24 @@ async def _startup_event():
     from src.cookbook_serve_lifecycle import cookbook_serve_lifecycle_loop
     _startup_tasks.append(asyncio.create_task(cookbook_serve_lifecycle_loop()))
 
+    # Start the system tray icon (cross-platform desktop environments only)
+    try:
+        from src.tray import setup_tray
+        setup_tray()
+    except Exception as e:
+        logger.warning(f"Failed to initialize system tray icon: {e}")
+
     logger.info("Application startup complete")
 
 async def _shutdown_event():
     logger.info("Application shutting down...")
+    # Stop the system tray icon
+    try:
+        from src.tray import stop_tray
+        stop_tray()
+    except Exception as e:
+        logger.debug(f"Failed to stop system tray icon: {e}")
+
     if upload_cleanup_task:
         upload_cleanup_task.cancel()
         try:
