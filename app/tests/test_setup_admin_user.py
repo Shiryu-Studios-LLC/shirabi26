@@ -2,9 +2,9 @@ import importlib.util
 import json
 from pathlib import Path
 
-
 def _load_setup_module():
-    spec = importlib.util.spec_from_file_location("odysseus_setup_under_test", Path("setup.py"))
+    setup_path = Path(__file__).resolve().parent.parent / "setup.py"
+    spec = importlib.util.spec_from_file_location("odysseus_setup_under_test", setup_path)
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
     spec.loader.exec_module(module)
