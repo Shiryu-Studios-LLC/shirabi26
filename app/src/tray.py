@@ -55,7 +55,7 @@ def setup_tray():
     app_url = f"http://{host}:{port}"
 
     def get_icon_image():
-        # Try to load custom override icon if present (excluding the screenshot docs/odysseus.jpg)
+        # Try to load custom override icon if present (excluding the screenshot docs/shirabe.jpg)
         for logo_name in ["logo.png", "logo.jpg", "favicon.png"]:
             for folder in ["static", "docs"]:
                 logo_path = os.path.join(os.path.dirname(__file__), "..", folder, logo_name)
@@ -66,7 +66,7 @@ def setup_tray():
                         logger.warning(f"Failed to load logo from {logo_path}: {e}")
         
         # Fallback/Default: Create a beautiful transparent 64x64 icon
-        # drawing the official sailboat logo matching the Odysseus theme.
+        # drawing the official sailboat logo matching the Shirabe theme.
         img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
         draw = ImageDraw.Draw(img)
         
@@ -95,7 +95,7 @@ def setup_tray():
         return img
 
     def on_clicked(icon, item):
-        if str(item) == "Open Odysseus":
+        if str(item) == "Open Shirabe":
             try:
                 webbrowser.open(app_url)
             except Exception as e:
@@ -118,20 +118,20 @@ def setup_tray():
 
     try:
         menu = pystray.Menu(
-            pystray.MenuItem("Open Odysseus", on_clicked, default=True),
+            pystray.MenuItem("Open Shirabe", on_clicked, default=True),
             pystray.MenuItem(f"Running on port {port}", lambda: None, enabled=False),
             pystray.MenuItem("Exit", on_clicked)
         )
         
         _tray_icon = pystray.Icon(
-            "odysseus",
+            "shirabe",
             get_icon_image(),
-            "Odysseus",
+            "Shirabe",
             menu=menu
         )
 
         # Run the icon's loop in a daemon thread so it doesn't block FastAPI's main thread
-        tray_thread = threading.Thread(target=_tray_icon.run, name="OdysseusTrayThread", daemon=True)
+        tray_thread = threading.Thread(target=_tray_icon.run, name="ShirabeTrayThread", daemon=True)
         tray_thread.start()
         logger.info(f"System tray icon started. Managing server at {app_url}")
     except Exception as e:

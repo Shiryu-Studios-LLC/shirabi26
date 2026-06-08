@@ -1,8 +1,9 @@
 from pathlib import Path
 
 
-CSS = Path("static/style.css").read_text(encoding="utf-8")
-INIT_JS = Path("static/js/init.js").read_text(encoding="utf-8")
+ROOT = Path(__file__).resolve().parents[1]
+CSS = (ROOT / "static/style.css").read_text(encoding="utf-8")
+INIT_JS = (ROOT / "static/js/init.js").read_text(encoding="utf-8")
 
 
 def test_both_minimized_window_docks_clear_the_composer():

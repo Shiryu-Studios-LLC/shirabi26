@@ -1,9 +1,22 @@
 import json
 import subprocess
 import sys
+import shutil
 
 import pytest
 from fastapi import HTTPException
+
+def _has_functional_bash():
+    if not shutil.which("bash"):
+        return False
+    try:
+        res = subprocess.run(["bash", "-c", "echo ok"], capture_output=True, text=True, timeout=2)
+        return res.returncode == 0 and "ok" in res.stdout
+    except Exception:
+        return False
+
+HAS_BASH = _has_functional_bash()
+
 
 from routes.cookbook_helpers import (
     _cached_model_scan_script,
@@ -117,6 +130,7 @@ def test_pip_install_fallback_chain_allows_custom_python_command():
     assert chain.count("bash -c '") == 2
 
 
+@pytest.mark.skipif(not HAS_BASH, reason="Functional bash shell not available")
 def test_pip_install_fallback_chain_propagates_failure_in_venv():
     """When base install fails inside a venv, the chain must exit non-zero.
 
@@ -143,6 +157,7 @@ def test_pip_install_fallback_chain_propagates_failure_in_venv():
     assert result.returncode != 0, "Chain should propagate failure when base fails in venv"
 
 
+@pytest.mark.skipif(not HAS_BASH, reason="Functional bash shell not available")
 def test_pip_install_fallback_chain_tries_user_outside_venv():
     """When base install fails outside a venv, the chain should try --user."""
     # Force "not in venv" by making venv_check return 1 directly.
@@ -220,6 +235,7 @@ def test_pip_install_attempt_no_bare_pipe_tail():
     assert "| tail" not in snippet
 
 
+@pytest.mark.skipif(not HAS_BASH, reason="Functional bash shell not available")
 def test_pip_install_attempt_failure_propagates_real_exit_code():
     """Run the generated snippet against a deliberately broken pip install
     to confirm the subshell exits with pip's non-zero status."""
@@ -233,6 +249,7 @@ def test_pip_install_attempt_failure_propagates_real_exit_code():
     assert result.returncode != 0, "pip install of a nonexistent package should fail"
 
 
+@pytest.mark.skipif(not HAS_BASH, reason="Functional bash shell not available")
 def test_pip_install_attempt_success_exits_zero():
     """When pip succeeds, the subshell should exit 0."""
     snippet = _pip_install_attempt("python3 -c 'pass'")
@@ -245,6 +262,7 @@ def test_pip_install_attempt_success_exits_zero():
     assert result.returncode == 0
 
 
+@pytest.mark.skipif(not HAS_BASH, reason="Functional bash shell not available")
 def test_pip_install_attempt_surfaces_stderr_on_failure():
     """On failure, the last 5 lines of pip output should appear in stdout."""
     snippet = _pip_install_attempt("python3 -m pip install __nonexistent_package_12345__")
@@ -277,16 +295,16 @@ def test_serve_preflight_failure_keeps_tmux_pane_visible():
     capture the helpful error, leaving users with a blank "crashed" card.
     """
     runner_lines = [
-        'ODYSSEUS_PREFLIGHT_EXIT=""',
+        'SHIRABE_PREFLIGHT_EXIT=""',
         'echo "ERROR: vLLM is not installed. Open Cookbook -> Dependencies and install vllm on this server, then launch again."',
-        'ODYSSEUS_PREFLIGHT_EXIT=127',
+        'SHIRABE_PREFLIGHT_EXIT=127',
     ]
     _append_serve_preflight_exit_lines(runner_lines, keep_shell_open=True)
     script = "\n".join(runner_lines)
 
     assert "ERROR: vLLM is not installed" in script
-    assert 'ODYSSEUS_PREFLIGHT_EXIT=127' in script
-    assert 'echo "=== Process exited with code $ODYSSEUS_PREFLIGHT_EXIT ==="' in script
+    assert 'SHIRABE_PREFLIGHT_EXIT=127' in script
+    assert 'echo "=== Process exited with code $SHIRABE_PREFLIGHT_EXIT ==="' in script
     assert 'exec "${SHELL:-/bin/bash}"' in script
     assert "exit 127" not in script
 
@@ -297,8 +315,8 @@ def test_serve_runner_preserves_command_exit_code():
     _append_serve_exit_code_lines(runner_lines, keep_shell_open=True)
     script = "\n".join(runner_lines)
 
-    assert "ODYSSEUS_CMD_EXIT=$?" in script
-    assert 'echo "=== Process exited with code $ODYSSEUS_CMD_EXIT ==="' in script
+    assert "SHIRABE_CMD_EXIT=$?" in script
+    assert 'echo "=== Process exited with code $SHIRABE_CMD_EXIT ==="' in script
     assert 'echo "=== Process exited with code $? ==="' not in script
 
 
@@ -310,7 +328,7 @@ def test_pip_serve_runner_emits_download_ok_before_exit_marker():
 
     assert 'echo "DOWNLOAD_OK"' in script
     assert script.index('echo "DOWNLOAD_OK"') < script.index("=== Process exited with code")
-    assert 'exit "$ODYSSEUS_CMD_EXIT"' in script
+    assert 'exit "$SHIRABE_CMD_EXIT"' in script
 
 
 def test_validate_serve_cmd_accepts_vllm_kv_cache_dtype():
@@ -392,7 +410,7 @@ def test_llama_cpp_linux_bootstrap_checks_cudart_before_cuda_build():
     _append_llama_cpp_linux_accel_build_lines(runner_lines)
     script = "\n".join(runner_lines)
 
-    assert '_odysseus_has_cudart' in script
+    assert '_shirabe_has_cudart' in script
     assert "grep -q 'libcudart\\.so'" in script
     # lib64 and lib variants for CUDA_HOME and /usr/local/cuda
     assert '$_cuh/lib64/libcudart.so' in script
@@ -402,7 +420,7 @@ def test_llama_cpp_linux_bootstrap_checks_cudart_before_cuda_build():
     # pip-installed nvidia runtime wheel sibling path
     assert 'cuda_runtime/lib/libcudart.so' in script
     # entire helper definition precedes the CUDA cmake invocation
-    assert script.index('_odysseus_has_cudart') < script.index('DGGML_CUDA=ON')
+    assert script.index('_shirabe_has_cudart') < script.index('DGGML_CUDA=ON')
 
 
 def test_llama_cpp_linux_bootstrap_cuda_cmake_present_when_cudart_found():
@@ -464,6 +482,7 @@ def test_llama_cpp_rebuild_cmd_clears_cached_build_paths():
     assert 'curl' not in cmd and 'wget' not in cmd
 
 
+@pytest.mark.skipif(not HAS_BASH, reason="Functional bash shell not available")
 def test_llama_cpp_rebuild_cmd_runs_clean_on_a_fresh_home(tmp_path):
     """The command should succeed even when neither path exists yet."""
     import os

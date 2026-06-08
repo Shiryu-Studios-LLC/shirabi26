@@ -163,7 +163,8 @@ def test_update_skill_scalar_keys_exclude_owner():
     updates={'owner': 'attacker'} and reassign the file. The fix
     removed 'owner' from scalar_keys; this test now asserts the
     fix is in place."""
-    src = Path("services/memory/skills.py").read_text(encoding="utf-8")
+    app_dir = Path(__file__).resolve().parents[1]
+    src = (app_dir / "services/memory/skills.py").read_text(encoding="utf-8")
     import re
     m = re.search(
         r"def update_skill\(.*?scalar_keys\s*=\s*\((.*?)\)",

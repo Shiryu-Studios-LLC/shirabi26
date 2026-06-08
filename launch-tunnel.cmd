@@ -1,10 +1,10 @@
 @echo off
 setlocal enabledelayedexpansion
-title Odysseus Cloudflare Tunnel
+title Shirabe Cloudflare Tunnel (調べ)
 cd /d "%~dp0"
 
 echo ===================================================
-echo   Odysseus Cloudflare Tunnel Native Launcher
+echo   Shirabe Cloudflare Tunnel (調べ) Native Launcher
 echo ===================================================
 echo.
 

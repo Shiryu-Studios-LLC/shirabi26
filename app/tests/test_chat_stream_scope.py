@@ -2,7 +2,8 @@ from pathlib import Path
 
 
 def test_stream_render_helpers_are_visible_to_catch_block():
-    source = Path("static/js/chat.js").read_text(encoding="utf-8")
+    ROOT = Path(__file__).resolve().parents[1]
+    source = (ROOT / "static/js/chat.js").read_text(encoding="utf-8")
     try_start = source.index("    try {\n      // Re-enable auto-scroll")
     catch_start = source.index("    } catch (err) {", try_start)
 

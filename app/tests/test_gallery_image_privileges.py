@@ -15,7 +15,8 @@ GATED_IMAGE_FUNCTIONS = {
 
 
 def _gallery_source():
-    return Path("routes/gallery_routes.py").read_text(encoding="utf-8")
+    app_dir = Path(__file__).resolve().parents[1]
+    return (app_dir / "routes/gallery_routes.py").read_text(encoding="utf-8")
 
 
 def _function_sources(source):

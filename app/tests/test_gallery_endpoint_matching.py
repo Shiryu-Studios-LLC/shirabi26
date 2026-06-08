@@ -3,7 +3,8 @@ from pathlib import Path
 
 def test_gallery_url_normalization_bug():
     # Read and parse the actual source file
-    source_path = Path("routes/gallery_routes.py")
+    app_dir = Path(__file__).resolve().parents[1]
+    source_path = app_dir / "routes/gallery_routes.py"
     assert source_path.exists(), "gallery_routes.py could not be found"
     
     source = source_path.read_text(encoding="utf-8")

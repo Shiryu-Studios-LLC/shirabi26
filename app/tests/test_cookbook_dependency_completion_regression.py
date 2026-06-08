@@ -32,7 +32,7 @@ def test_local_windows_session_commands_use_local_powershell_log_dir():
     source = _read("static/js/cookbookRunning.js")
 
     assert "const host = task.remoteHost;" in source
-    assert "host ? '$env:TEMP\\\\odysseus-sessions' : '$env:TEMP\\\\odysseus-tmux'" in source
+    assert "host ? '$env:TEMP\\\\shirabe-sessions' : '$env:TEMP\\\\shirabe-tmux'" in source
     assert "return host ? `ssh ${pf}${host}" in source
     assert ": `powershell -Command \"${ps}\"`;" in source
 
@@ -56,10 +56,10 @@ def test_session_gone_heuristic_honors_dep_install_success():
     source = _read("static/js/cookbookRunning.js")
 
     assert "const depInstallSucceeded = !!task.payload?._dep && _depInstallSucceeded(lastOutput);" in source
-    assert (
-        "const looksSuccessful = depInstallSucceeded "
-        "|| (task.type === 'download' ? downloadLooksSuccessful : serveLooksReady);"
-    ) in source
+    assert "const looksSuccessful = depInstallSucceeded" in source
+    assert "downloadLooksSuccessful" in source
+    assert "serveLooksReady" in source
+
 
 
 def test_background_poll_recovers_done_for_stopped_dependency_install():

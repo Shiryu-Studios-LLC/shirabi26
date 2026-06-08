@@ -34,11 +34,11 @@ def test_validate_caldav_url_rejects_unsafe_urls(url, message):
 
 
 def test_validate_caldav_url_blocks_private_ips_unless_explicitly_allowed(monkeypatch):
-    monkeypatch.delenv("ODYSSEUS_ALLOW_PRIVATE_CALDAV", raising=False)
+    monkeypatch.delenv("SHIRABE_ALLOW_PRIVATE_CALDAV", raising=False)
     with pytest.raises(ValueError, match="Private CalDAV IPs require"):
         caldav_sync.validate_caldav_url("http://10.0.0.5:5232/dav")
 
-    monkeypatch.setenv("ODYSSEUS_ALLOW_PRIVATE_CALDAV", "1")
+    monkeypatch.setenv("SHIRABE_ALLOW_PRIVATE_CALDAV", "1")
     assert caldav_sync.validate_caldav_url("http://10.0.0.5:5232/dav") == "http://10.0.0.5:5232/dav"
 
 
@@ -88,7 +88,8 @@ def test_sync_caldav_decrypts_stored_password_and_validates_url(monkeypatch):
 
 
 def test_calendar_routes_use_hardened_caldav_client_and_secret_storage():
-    text = Path("routes/calendar_routes.py").read_text(encoding="utf-8")
+    app_dir = Path(__file__).resolve().parents[1]
+    text = (app_dir / "routes/calendar_routes.py").read_text(encoding="utf-8")
 
     assert "validate_caldav_url(body.get(\"url\", \"\"))" in text
     assert "cfg[\"password\"] = encrypt(body[\"password\"])" in text

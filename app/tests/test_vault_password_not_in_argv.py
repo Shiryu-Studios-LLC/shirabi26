@@ -102,7 +102,10 @@ def test_unlock_handler_feeds_password_on_stdin_not_argv():
 
 
 def test_tool_vault_unlock_feeds_password_on_stdin_not_argv():
-    text = open("src/tool_implementations.py", encoding="utf-8").read()
+    test_dir = os.path.dirname(os.path.abspath(__file__))
+    app_dir = os.path.dirname(test_dir)
+    src_file = os.path.join(app_dir, "src", "tool_implementations.py")
+    text = open(src_file, encoding="utf-8").read()
 
     assert '["unlock", master_password, "--raw"]' not in text
     assert '_run_bw(["unlock", master_password' not in text

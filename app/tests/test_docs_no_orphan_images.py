@@ -51,6 +51,16 @@ def test_no_orphan_images_in_docs():
             haystack.append(p.read_text(encoding="utf-8", errors="ignore"))
         except OSError:
             continue
+
+    # Also check top-level files in the parent directory (like README.md) if they exist
+    for name in ["README.md", "LICENSE", "CONTRIBUTING.md"]:
+        p = REPO.parent / name
+        if p.exists():
+            try:
+                haystack.append(p.read_text(encoding="utf-8", errors="ignore"))
+            except OSError:
+                pass
+
     blob = "\n".join(haystack)
 
     orphans = [

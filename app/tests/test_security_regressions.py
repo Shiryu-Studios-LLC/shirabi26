@@ -17,6 +17,9 @@ import json
 import importlib
 from pathlib import Path
 
+ROOT_DIR = Path(__file__).resolve().parents[2]
+APP_DIR = Path(__file__).resolve().parents[1]
+
 import pytest
 
 
@@ -115,22 +118,22 @@ def test_secret_storage_key_created_with_safe_mode(tmp_path, monkeypatch):
 # ── secure-by-default deployment + integration storage ─────────
 
 def test_docker_compose_binds_web_ui_to_loopback_by_default():
-    compose = Path("docker-compose.yml").read_text(encoding="utf-8")
+    compose = (ROOT_DIR / "docker-compose.yml").read_text(encoding="utf-8")
     assert "${APP_BIND:-127.0.0.1}:${APP_PORT:-7000}:7000" in compose
     assert '"${APP_PORT:-7000}:7000"' not in compose
 
 
 def test_readme_native_quickstart_uses_loopback():
-    readme = Path("README.md").read_text(encoding="utf-8")
+    readme = (ROOT_DIR / "README.md").read_text(encoding="utf-8")
     assert "python -m uvicorn app:app --host 127.0.0.1 --port 7000" in readme
     assert "0.0.0.0` only when you intentionally want" in readme
 
 
 def test_ollama_cookbook_runner_does_not_force_public_bind():
-    route = Path("routes/cookbook_routes.py").read_text(encoding="utf-8")
-    cookbook_js = Path("static/js/cookbook.js").read_text(encoding="utf-8")
-    assert 'OLLAMA_HOST="0.0.0.0:${ODYSSEUS_OLLAMA_PORT}" ollama serve' not in route
-    assert 'OLLAMA_HOST="${ODYSSEUS_OLLAMA_HOST}:${ODYSSEUS_OLLAMA_PORT}" ollama serve' in route
+    route = (APP_DIR / "routes/cookbook_routes.py").read_text(encoding="utf-8")
+    cookbook_js = (APP_DIR / "static/js/cookbook.js").read_text(encoding="utf-8")
+    assert 'OLLAMA_HOST="0.0.0.0:${SHIRABE_OLLAMA_PORT}" ollama serve' not in route
+    assert 'OLLAMA_HOST="${SHIRABE_OLLAMA_HOST}:${SHIRABE_OLLAMA_PORT}" ollama serve' in route
     assert '_ollama_default_host = "0.0.0.0" if remote else "127.0.0.1"' in route
     assert "WARNING: remote Ollama will bind" in route
     assert "OLLAMA_HOST=0.0.0.0:${ollamaPort}" not in cookbook_js
@@ -498,26 +501,26 @@ def test_require_user_rejects_unauthenticated(monkeypatch):
 
 
 def test_inprocess_pollers_gate(monkeypatch):
-    """The ODYSSEUS_INPROCESS_POLLERS env var must let operators kill
+    """The SHIRABE_INPROCESS_POLLERS env var must let operators kill
     the asyncio pollers when cron / systemd is driving the one-shot
-    `odysseus-mail poll-*` CLI subcommands instead. Two pollers racing
+    `shirabe-mail poll-*` CLI subcommands instead. Two pollers racing
     on the same SQLite would mark scheduled rows as 'sent' twice."""
     import sys as _sys
     _sys.modules.pop("routes.email_pollers", None)
     from routes.email_pollers import _inprocess_pollers_enabled  # noqa: WPS433
 
     # Defaults to enabled (preserves single-process deployments).
-    monkeypatch.delenv("ODYSSEUS_INPROCESS_POLLERS", raising=False)
+    monkeypatch.delenv("SHIRABE_INPROCESS_POLLERS", raising=False)
     assert _inprocess_pollers_enabled() is True
 
     # Any of the off-values disables.
     for off in ("0", "false", "no", "off", "FALSE", "Off"):
-        monkeypatch.setenv("ODYSSEUS_INPROCESS_POLLERS", off)
+        monkeypatch.setenv("SHIRABE_INPROCESS_POLLERS", off)
         assert _inprocess_pollers_enabled() is False, f"{off!r} should disable"
 
     # Explicit on-values stay enabled.
     for on in ("1", "true", "yes", "anything-truthy"):
-        monkeypatch.setenv("ODYSSEUS_INPROCESS_POLLERS", on)
+        monkeypatch.setenv("SHIRABE_INPROCESS_POLLERS", on)
         assert _inprocess_pollers_enabled() is True, f"{on!r} should enable"
 
 
@@ -752,7 +755,7 @@ def _load_search_content_for_test(monkeypatch, name="services.search.content_und
     analytics.RateLimitError = RuntimeError
     analytics.error_logger = _types.SimpleNamespace(error=lambda *a, **k: None)
     cache = _types.ModuleType("services.search.cache")
-    cache.CONTENT_CACHE_DIR = Path("/tmp/odysseus-test-content-cache")
+    cache.CONTENT_CACHE_DIR = Path("/tmp/shirabe-test-content-cache")
     cache.content_cache_index = {}
     cache.generate_cache_key = lambda url: "test-cache-key"
     cache.cleanup_cache = lambda: None

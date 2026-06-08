@@ -170,7 +170,9 @@ def _is_sensitive_path(resolved: str) -> bool:
     """Return True if *resolved* falls under a sensitive directory or
     matches a sensitive filename — regardless of what root it sits under.
     """
-    parts = resolved.split(os.sep)
+    # Normalize separators to '/' so it works on both Windows and POSIX.
+    normalized = resolved.replace("\\", "/")
+    parts = normalized.split("/")
     filenames: set[str] = {parts[-1]} if parts else set()
 
     # Check if any path component is a sensitive directory.
@@ -206,8 +208,8 @@ def _tool_path_roots() -> list[str]:
     except OSError:
         pass
 
-    # $TMPDIR — per-user temp root on macOS (e.g. /var/folders/.../T/).
-    tmpdir = os.environ.get("TMPDIR")
+    # $TMPDIR — per-user temp root on macOS/Linux/Windows.
+    tmpdir = os.environ.get("TMPDIR") or os.environ.get("TEMP") or os.environ.get("TMP")
     if tmpdir:
         roots.append(tmpdir)
 

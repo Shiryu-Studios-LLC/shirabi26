@@ -1,11 +1,11 @@
 @echo off
 setlocal enabledelayedexpansion
-title Odysseus Launcher
+title Shirabe Launcher (調べ)
 
 cd /d "%~dp0"
 
 echo ===================================================
-echo   Odysseus Native Windows Launcher
+echo   Shirabe Native Windows Launcher (調べ)
 echo ===================================================
 echo.
 
@@ -62,7 +62,7 @@ echo ==^> Checking for updates...
 git pull --ff-only
 if not errorlevel 1 goto :git_success
 echo WARNING: Git pull failed (you may be offline or have local changes).
-echo          Continuing to launch Odysseus anyway...
+echo          Continuing to launch Shirabe anyway...
 goto :git_done
 
 :git_success
@@ -153,17 +153,17 @@ if errorlevel 1 (
 
 :: 6. Start the server
 echo.
-echo ==^> Starting Odysseus at http://!BIND_HOST!:!BIND_PORT!
+echo ==^> Starting Shirabe at http://!BIND_HOST!:!BIND_PORT!
 echo Press Ctrl+C to stop.
 echo.
 venv\Scripts\python.exe -m uvicorn app.app:app --host !BIND_HOST! --port !BIND_PORT!
 if errorlevel 1 (
     echo.
-    echo ERROR: Odysseus failed to start or exited with an error.
+    echo ERROR: Shirabe failed to start or exited with an error.
     pause
     exit /b !errorlevel!
 )
 echo.
-echo Odysseus server has shut down.
+echo Shirabe server has shut down.
 pause
 

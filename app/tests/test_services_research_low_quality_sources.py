@@ -12,6 +12,7 @@ live path.
 import importlib.util
 import sys
 import types
+from pathlib import Path
 
 import pytest
 
@@ -20,6 +21,7 @@ import pytest
 def handler_cls(monkeypatch):
     """Load services.research.research_handler from its file path so the
     heavy services/__init__.py (httpx etc.) is never imported."""
+    app_dir = Path(__file__).resolve().parents[1]
     pkg = types.ModuleType("services")
     pkg.__path__ = []
     sub = types.ModuleType("services.research")
@@ -29,7 +31,7 @@ def handler_cls(monkeypatch):
     name = "services.research.research_handler"
     monkeypatch.delitem(sys.modules, name, raising=False)
     spec = importlib.util.spec_from_file_location(
-        name, "services/research/research_handler.py"
+        name, str(app_dir / "services/research/research_handler.py")
     )
     mod = importlib.util.module_from_spec(spec)
     monkeypatch.setitem(sys.modules, name, mod)

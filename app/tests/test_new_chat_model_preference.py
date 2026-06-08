@@ -1,7 +1,8 @@
 from pathlib import Path
 
 
-APP_JS = Path("static/app.js")
+ROOT_DIR = Path(__file__).resolve().parents[1]
+APP_JS = ROOT_DIR / "static/app.js"
 
 
 def _slice(source, start_marker, end_marker):
