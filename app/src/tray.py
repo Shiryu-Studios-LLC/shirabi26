@@ -52,8 +52,8 @@ def setup_tray():
         return
 
     host, port = get_server_address()
-    portal_url = os.environ.get("PORTAL_URL")
-    app_url = portal_url or f"http://{host}:{port}"
+    tunnel_url = os.environ.get("TUNNEL_URL")
+    app_url = tunnel_url or f"http://{host}:{port}"
 
     def get_icon_image():
         # Try to load custom override icon if present (excluding the screenshot docs/shirabe.jpg)
@@ -121,8 +121,8 @@ def setup_tray():
         menu_items = [
             pystray.MenuItem("Open Shirabe", on_clicked, default=True),
         ]
-        if portal_url:
-            menu_items.append(pystray.MenuItem(f"Portal: {portal_url}", lambda: None, enabled=False))
+        if tunnel_url:
+            menu_items.append(pystray.MenuItem(f"Tunnel: {tunnel_url}", lambda: None, enabled=False))
         menu_items.extend([
             pystray.MenuItem(f"Running on port {port}", lambda: None, enabled=False),
             pystray.MenuItem("Exit", on_clicked)
