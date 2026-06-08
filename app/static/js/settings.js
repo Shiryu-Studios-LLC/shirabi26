@@ -874,10 +874,20 @@ async function initTtsSettings() {
 
   async function saveTTS() {
     try {
+      var enabled = ttsEnabledToggle ? ttsEnabledToggle.checked : true;
+      var provider = provSel.value;
       await fetch('/api/auth/settings', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tts_enabled: ttsEnabledToggle ? ttsEnabledToggle.checked : true, tts_provider: provSel.value, tts_model: getModel() || 'tts-1', tts_voice: getVoice() || 'alloy', tts_speed: speedSelect.value || '1' }) });
+        body: JSON.stringify({ tts_enabled: enabled, tts_provider: provider, tts_model: getModel() || 'tts-1', tts_voice: getVoice() || 'alloy', tts_speed: speedSelect.value || '1' }) });
       ttsMsg.textContent = 'Saved'; ttsMsg.style.color = 'var(--fg)'; setTimeout(() => { ttsMsg.textContent = ''; }, 2000);
       if (window.aiTTSManager) window.aiTTSManager.checkAvailability();
+
+      // Update overflow button visibility in real-time based on new settings
+      var ttsOff = !enabled || provider === 'disabled';
+      var overflowTts = document.getElementById('overflow-tts-btn');
+      if (overflowTts) {
+        overflowTts.style.display = ttsOff ? 'none' : '';
+      }
+      document.dispatchEvent(new CustomEvent('overflow-state-change'));
     } catch (e) { ttsMsg.textContent = 'Failed to save'; ttsMsg.style.color = 'var(--red)'; }
   }
 

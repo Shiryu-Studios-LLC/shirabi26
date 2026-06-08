@@ -4,6 +4,8 @@ title Shirabe Launcher (調べ)
 
 cd /d "%~dp0"
 
+if "%~1"=="--tunnel" goto :run_tunnel
+
 echo ===================================================
 echo   Shirabe Native Windows Launcher (調べ)
 echo ===================================================
@@ -151,19 +153,109 @@ if errorlevel 1 (
     echo       https://git-scm.com/download/win
 )
 
+:: 5.5. Start Cloudflare Tunnel automatically if configured in .env
+if exist .env (
+    set "HAS_TUNNEL="
+    for /f "usebackq delims=" %%x in (".env") do (
+        set "line=%%x"
+        if "!line:~0,13!"=="TUNNEL_TOKEN=" (
+            set "token_val=!line:~13!"
+            if not "!token_val!"=="" set HAS_TUNNEL=1
+        )
+    )
+    if defined HAS_TUNNEL (
+        echo ==^> Starting Cloudflare Tunnel in background (hidden)...
+        powershell -Command "Start-Process cmd -ArgumentList '/c launch-windows.cmd --tunnel' -WindowStyle Hidden"
+    )
+)
+
 :: 6. Start the server
 echo.
 echo ==^> Starting Shirabe at http://!BIND_HOST!:!BIND_PORT!
 echo Press Ctrl+C to stop.
 echo.
 venv\Scripts\python.exe -m uvicorn app.app:app --host !BIND_HOST! --port !BIND_PORT!
-if errorlevel 1 (
+set EXIT_CODE=%errorlevel%
+
+:: Stop Cloudflare Tunnel if it was started
+taskkill /f /im cloudflared.exe >nul 2>nul
+
+if %EXIT_CODE% neq 0 (
     echo.
     echo ERROR: Shirabe failed to start or exited with an error.
     pause
-    exit /b !errorlevel!
+    exit /b %EXIT_CODE%
 )
 echo.
 echo Shirabe server has shut down.
 pause
+exit /b 0
+
+:run_tunnel
+title Shirabe Cloudflare Tunnel (調べ)
+echo ===================================================
+echo   Shirabe Cloudflare Tunnel (調べ) Native Launcher
+echo ===================================================
+echo.
+
+:: 1. Parse TUNNEL_TOKEN from .env
+set TUNNEL_TOKEN=
+for /f "usebackq delims=" %%x in (".env") do (
+    set "line=%%x"
+    if "!line:~0,13!"=="TUNNEL_TOKEN=" (
+        set "TUNNEL_TOKEN=!line:~13!"
+    )
+)
+
+:: Trim spaces or quotes if any
+if not "!TUNNEL_TOKEN!"=="" (
+    for /f "tokens=* delims= " %%a in ("!TUNNEL_TOKEN!") do set TUNNEL_TOKEN=%%a
+)
+
+if "!TUNNEL_TOKEN!"=="" (
+    echo ERROR: TUNNEL_TOKEN is not configured in your .env file.
+    echo.
+    echo Please open the .env file in the root directory, locate
+    echo the TUNNEL_TOKEN= line under the Cloudflare section,
+    echo set it to your Cloudflare Tunnel Token, and restart this script.
+    echo.
+    pause
+    exit /b 1
+)
+
+:: 2. Check for cloudflared command
+where cloudflared >nul 2>nul
+if errorlevel 1 (
+    :: Try standard installations
+    if exist "C:\Program Files (x86)\cloudflared\cloudflared.exe" (
+        set CLOUDFLARED_EXE="C:\Program Files (x86)\cloudflared\cloudflared.exe"
+    ) else if exist "C:\Program Files\cloudflared\cloudflared.exe" (
+        set CLOUDFLARED_EXE="C:\Program Files\cloudflared\cloudflared.exe"
+    ) else (
+        echo ERROR: cloudflared was not found on PATH or in standard install locations.
+        echo Please download and install the Cloudflare Tunnel daemon:
+        echo https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/
+        echo.
+        pause
+        exit /b 1
+    )
+) else (
+    set CLOUDFLARED_EXE=cloudflared
+)
+
+echo ==^> Starting Cloudflare Tunnel...
+echo Using token prefix: !TUNNEL_TOKEN:~0,10!***************************
+echo.
+
+!CLOUDFLARED_EXE! tunnel run --token !TUNNEL_TOKEN!
+if errorlevel 1 (
+    echo.
+    echo ERROR: Cloudflare Tunnel exited with an error.
+    pause
+    exit /b !errorlevel!
+)
+echo.
+echo Tunnel closed.
+pause
+exit /b 0
 
