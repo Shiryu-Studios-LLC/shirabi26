@@ -4,6 +4,10 @@ title Shirabe Launcher (調べ)
 
 cd /d "%~dp0"
 
+:: Standard paths for Cloudflare Tunnel (defined globally to avoid parenthesis parser crashes inside IF blocks)
+set "CLOUDFLARED_X86=C:\Program Files (x86)\cloudflared\cloudflared.exe"
+set "CLOUDFLARED_64=C:\Program Files\cloudflared\cloudflared.exe"
+
 if "%~1"=="--tunnel" goto :run_tunnel
 
 echo ===================================================
@@ -154,19 +158,16 @@ if errorlevel 1 (
 )
 
 :: 5.5. Start Cloudflare Tunnel automatically if configured in .env
+set "token_val="
 if exist .env (
-    set "HAS_TUNNEL="
-    for /f "usebackq delims=" %%x in (".env") do (
+    for /f "usebackq delims=" %%x in (`findstr /b "TUNNEL_TOKEN=" .env 2^>nul`) do (
         set "line=%%x"
-        if "!line:~0,13!"=="TUNNEL_TOKEN=" (
-            set "token_val=!line:~13!"
-            if not "!token_val!"=="" set HAS_TUNNEL=1
-        )
+        set "token_val=!line:~13!"
     )
-    if defined HAS_TUNNEL (
-        echo ==^> Starting Cloudflare Tunnel in background (hidden)...
-        powershell -Command "Start-Process cmd -ArgumentList '/c shirabe.cmd --tunnel' -WindowStyle Hidden"
-    )
+)
+if not "!token_val!"=="" (
+    echo ==^> Starting Cloudflare Tunnel in background [hidden]...
+    powershell -Command "Start-Process cmd -ArgumentList '/c shirabe.cmd --tunnel' -WindowStyle Hidden"
 )
 
 :: 6. Start the server
@@ -200,9 +201,9 @@ echo.
 
 :: 1. Parse TUNNEL_TOKEN from .env
 set TUNNEL_TOKEN=
-for /f "usebackq delims=" %%x in (".env") do (
-    set "line=%%x"
-    if "!line:~0,13!"=="TUNNEL_TOKEN=" (
+if exist .env (
+    for /f "usebackq delims=" %%x in (`findstr /b "TUNNEL_TOKEN=" .env 2^>nul`) do (
+        set "line=%%x"
         set "TUNNEL_TOKEN=!line:~13!"
     )
 )
@@ -227,10 +228,10 @@ if "!TUNNEL_TOKEN!"=="" (
 where cloudflared >nul 2>nul
 if errorlevel 1 (
     :: Try standard installations
-    if exist "C:\Program Files (x86)\cloudflared\cloudflared.exe" (
-        set CLOUDFLARED_EXE="C:\Program Files (x86)\cloudflared\cloudflared.exe"
-    ) else if exist "C:\Program Files\cloudflared\cloudflared.exe" (
-        set CLOUDFLARED_EXE="C:\Program Files\cloudflared\cloudflared.exe"
+    if exist "!CLOUDFLARED_X86!" (
+        set CLOUDFLARED_EXE="!CLOUDFLARED_X86!"
+    ) else if exist "!CLOUDFLARED_64!" (
+        set CLOUDFLARED_EXE="!CLOUDFLARED_64!"
     ) else (
         echo ERROR: cloudflared was not found on PATH or in standard install locations.
         echo Please download and install the Cloudflare Tunnel daemon:
